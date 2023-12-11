@@ -2,12 +2,28 @@ import "./App.css";
 import Nav from "./components/Nav";
 import Banner from "./components/Banner";
 import { styled } from "styled-components";
+import Category from "./components/Category";
+import requests from "./api/requests";
+import Row from "./components/Row";
 
 function App() {
+  const rows = [
+    { title: "Trending Now", id: "TN", fetchUrl: requests.fetchTrending },
+    { title: "Top Rated", id: "TR", fetchUrl: requests.fetchTopRated },
+    { title: "Action Movies", id: "AM", fetchUrl: requests.fetchActionMovies },
+    { title: "Comedy Movies", id: "CM", fetchUrl: requests.fetchComedyMovies },
+  ];
+
+  const rowComponents = rows.map((row, index) => (
+    <Row key={index} title={row.title} id={row.id} fetchUrl={row.fetchUrl} />
+  ));
+
   return (
     <Container>
       <Nav />
       <Banner />
+      <Category />
+      {rowComponents}
     </Container>
   );
 }

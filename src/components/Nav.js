@@ -120,6 +120,7 @@ const Logo = styled.a`
   max-height: 70px;
   font-size: 0;
   diplay: inline-block;
+  cursor: pointer;
 
   img {
     display: block;

@@ -26,7 +26,7 @@ const Nav = () => {
   const handleChange = (e) => {
     setSearchValue(e.target.value);
     e.target.value === ""
-      ? navigate(`/searchpage`)
+      ? navigate(`/main`)
       : navigate(`/search?q=${e.target.value}`);
   };
 
@@ -142,7 +142,7 @@ const Logo = styled.a`
   margin-top: 4px;
   max-height: 70px;
   font-size: 0;
-  diplay: inline-block;
+  display: inline-block;
   cursor: pointer;
 
   img {

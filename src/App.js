@@ -1,50 +1,33 @@
+import { Outlet, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Nav from "./components/Nav";
-import Banner from "./components/Banner";
-import { styled } from "styled-components";
-import Category from "./components/Category";
-import requests from "./api/requests";
-import Row from "./components/Row";
+import LoginPage from "./pages/LoginPage/index";
+import MainPage from "./pages/MainPage/index";
+import DetailPage from "./pages/DetailPage/index";
+import SearchPage from "./pages/SearchPage/index";
+
+const Layout = () => {
+  return (
+    <div>
+      <Nav />
+      <Outlet />
+    </div>
+  );
+};
 
 function App() {
-  const rows = [
-    { title: "Trending Now", id: "TN", fetchUrl: requests.fetchTrending },
-    { title: "Top Rated", id: "TR", fetchUrl: requests.fetchTopRated },
-    { title: "Action Movies", id: "AM", fetchUrl: requests.fetchActionMovies },
-    { title: "Comedy Movies", id: "CM", fetchUrl: requests.fetchComedyMovies },
-  ];
-
-  const rowComponents = rows.map((row, index) => (
-    <Row key={index} title={row.title} id={row.id} fetchUrl={row.fetchUrl} />
-  ));
-
   return (
-    <Container>
-      <Nav />
-      <Banner />
-      <Category />
-      {rowComponents}
-    </Container>
+    <div className="app">
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<LoginPage />}></Route>
+          <Route path="main" element={<MainPage />}></Route>
+          <Route path=":movieId" element={<DetailPage />}></Route>
+          <Route path="search" element={<SearchPage />}></Route>
+        </Route>
+      </Routes>
+    </div>
   );
 }
 
 export default App;
-
-const Container = styled.main`
-  position: relative;
-  min-height: calc(100vh - 250px);
-  overflow-x: hidden;
-  display: block;
-  top: 72px;
-  padding: 0 calc(3.5vw + 5px);
-
-  &:after {
-    background: url("/images/home-background.png") center center / cover
-      no-repeat fixed;
-    content: "";
-    position: absolute;
-    inset: 0px;
-    opacity: 1;
-    z-index: -1;
-  }
-`;

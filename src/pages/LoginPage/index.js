@@ -15,6 +15,7 @@ const LoginPage = () => {
           </Description>
           <LogoTwo src="/images/cta-logo-two.png" />
         </Center>
+        <BgImage />
       </Content>
     </Container>
   );

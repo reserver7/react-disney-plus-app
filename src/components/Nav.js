@@ -1,12 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithPopup,
+  signOut,
+} from "firebase/auth";
 
 const Nav = () => {
+  const initialUserData = localStorage.getItem("userData")
+    ? JSON.parse(localStorage.getItem("userData"))
+    : {};
   const [show, setShow] = useState(false);
   const { pathname } = useLocation();
   const [searchValue, setSearchValue] = useState("");
   const navigate = useNavigate();
+  const auth = getAuth();
+  const provider = new GoogleAuthProvider();
+  const [userData, setUserData] = useState(initialUserData);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        if (pathname === "/") {
+          navigate("/main");
+        }
+      } else {
+        navigate("/");
+      }
+    });
+  }, [auth, pathname, navigate]);
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
@@ -25,9 +50,33 @@ const Nav = () => {
 
   const handleChange = (e) => {
     setSearchValue(e.target.value);
-    e.target.value === ""
-      ? navigate(`/main`)
-      : navigate(`/search?q=${e.target.value}`);
+    navigate(`/search?q=${e.target.value}`);
+    // e.target.value === ""
+    //   ? navigate(`/main`)
+    //   : navigate(`/search?q=${e.target.value}`);
+  };
+
+  const handleAuth = () => {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        setUserData(result.user);
+        localStorage.setItem("userData", JSON.stringify(result.user));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const handleSignOut = () => {
+    signOut(auth)
+      .then(() => {
+        setUserData({});
+        navigate(`/`);
+        localStorage.removeItem("userData");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
@@ -41,15 +90,23 @@ const Nav = () => {
       </Logo>
 
       {pathname === "/" ? (
-        <Login>Login</Login>
+        <Login onClick={handleAuth}>Login</Login>
       ) : (
-        <Input
-          value={searchValue}
-          onChange={handleChange}
-          className="nav_input"
-          type="text"
-          placeholder="검색해주세요."
-        />
+        <>
+          <Input
+            value={searchValue}
+            onChange={handleChange}
+            className="nav_input"
+            type="text"
+            placeholder="검색해주세요."
+          />
+          <SignOut>
+            <UserImg src={userData.photoURL} alt={userData.displayName} />
+            <DropDown>
+              <span onClick={handleSignOut}>Sign Out</span>
+            </DropDown>
+          </SignOut>
+        </>
       )}
     </NavWrapper>
   );
@@ -57,43 +114,43 @@ const Nav = () => {
 
 export default Nav;
 
-// const DropDown = styled.div`
-//   position: absolute;
-//   top: 48px;
-//   right: 0px;
-//   background: rgb(19, 19, 19)
-//   border: 1px solid rgba(151, 151, 151, 0.34);
-//   border-radius:  4px;
-//   box-shadow: rgb(0 0 0 /50%) 0px 0px 18px 0px;
-//   padding: 10px;
-//   font-size: 14px;
-//   letter-spacing: 3px;
-//   width: 100%;
-//   opacity: 0;
-// `;
+const DropDown = styled.div`
+  position: absolute;
+  top: 48px;
+  right: 0px;
+  background: rgb(19, 19, 19);
+  border: 1px solid rgba(151, 151, 151, 0.34);
+  border-radius: 4px;
+  box-shadow: rgb(0 0 0 /50%) 0px 0px 18px 0px;
+  padding: 10px;
+  font-size: 14px;
+  letter-spacing: 3px;
+  width: 100%;
+  opacity: 0;
+`;
 
-// const SignOut = styled.div`
-//   position: relative;
-//   height: 48px;
-//   width: 48px;
-//   display: flex;
-//   cursor: pointer;
-//   align-items: center;
-//   justify-content: center;
+const SignOut = styled.div`
+  position: relative;
+  height: 48px;
+  width: 48px;
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
 
-//   &:hover {
-//     ${DropDown} {
-//       opacity: 1;
-//       transition-duration: 1s;
-//     }
-//   }
-// `;
+  &:hover {
+    ${DropDown} {
+      opacity: 1;
+      transition-duration: 1s;
+    }
+  }
+`;
 
-// const UserImg = styled.img`
-//   border-radius: 50%;
-//   width: 100%;
-//   height: 100%;
-// `;
+const UserImg = styled.img`
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+`;
 
 const Login = styled.a`
   background-color: rgba(0, 0, 0, 0.6);
@@ -102,6 +159,7 @@ const Login = styled.a`
   letter-spacing: 1.5px;
   border: 1px solid #f9f9f9;
   transition: all 0.2s ease 0s;
+  cursor: pointer;
 
   &:hover {
     background-color: #f9f9f9;

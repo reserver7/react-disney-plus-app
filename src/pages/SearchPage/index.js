@@ -1,37 +1,33 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "../../api/axios";
-import "./SearchPage.css";
 import { useDebounce } from "../../hooks/useDebounce";
+import "./SearchPage.css";
 
 const SearchPage = () => {
   const navigate = useNavigate();
   const [searchResults, setSearchResults] = useState([]);
-
   const useQuery = () => {
     return new URLSearchParams(useLocation().search);
   };
-
   let query = useQuery();
   const searchTerm = query.get("q");
-  const debounceSearchTerm = useDebounce(query.get("q"), 500);
-
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
   useEffect(() => {
-    if (debounceSearchTerm) {
-      fetchSearchMovie(debounceSearchTerm);
+    if (debouncedSearchTerm) {
+      fetchSearchMovie(debouncedSearchTerm);
     }
-  }, [debounceSearchTerm]);
+  }, [debouncedSearchTerm]);
 
   const fetchSearchMovie = async (searchTerm) => {
     try {
       const response = await axios.get(
         `/search/multi?include_adult=false&query=${searchTerm}`
       );
-
       setSearchResults(response.data.results);
-      console.log(response);
-    } catch (err) {
-      console.log(err);
+      // console.log('response',response);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -46,13 +42,11 @@ const SearchPage = () => {
               <div className="movie" key={movie.id}>
                 <div
                   className="movie__column-poster"
-                  onClick={() => {
-                    navigate(`/${movie.id}`);
-                  }}
+                  onClick={() => navigate(`/${movie.id}`)}
                 >
                   <img
                     src={movieImageUrl}
-                    alt={movie}
+                    alt="movie"
                     className="movie__poster"
                   />
                 </div>

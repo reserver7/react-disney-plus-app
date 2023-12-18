@@ -5,4 +5,4 @@
 ![Disney02](https://github.com/reserver7/react-disney-plus-app/assets/78328320/0f131b0b-0a1c-400c-84b8-c3223c5d0a55)
 
 ## 프로젝트에 사용한 기술
-### React, Rudex, react-router-dom, axios, custom hooks, swiper, firebase
+### React, Redux, react-router-dom, axios, custom hooks, swiper, firebase
